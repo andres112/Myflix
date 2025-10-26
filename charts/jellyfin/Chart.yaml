@@ -1,0 +1,5 @@
+# Chart.yaml for Jellyfin Helm chart
+apiVersion: v2
+name: jellyfin
+version: 0.1.0
+description: A Helm chart for deploying Jellyfin
