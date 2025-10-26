@@ -9,6 +9,9 @@ spec:
     storage: 1Gi
   accessModes: ["ReadWriteOnce"]
   persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: {{ include "jellyfin.fullname" . }}-pvc-config
   hostPath:
     path: {{ .Values.persistence.config }}
 ---
@@ -37,6 +40,9 @@ spec:
     storage: 5Gi
   accessModes: ["ReadWriteOnce"]
   persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: {{ include "jellyfin.fullname" . }}-pvc-cache
   hostPath:
     path: {{ .Values.persistence.cache }}
 ---

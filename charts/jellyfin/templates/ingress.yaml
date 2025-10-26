@@ -18,7 +18,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "jellyfin.fullname" . }}
+                name: {{ include "jellyfin.fullname" . }}-svc
                 port:
                   number: {{ .Values.service.port }}
 {{- end }}

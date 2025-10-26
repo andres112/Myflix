@@ -17,7 +17,7 @@ spec:
         {{- include "jellyfin.labels" . | nindent 8 }}
     spec:
       containers:
-        - name: jellyfin
+        - name: jellyfin-streaming
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -47,10 +47,10 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: jellyfin-config
+            claimName: {{ include "jellyfin.fullname" . }}-pvc-config
         - name: cache
           persistentVolumeClaim:
-            claimName: jellyfin-cache
+            claimName: {{ include "jellyfin.fullname" . }}-pvc-cache
         - name: media
           hostPath:
             path: {{ .Values.persistence.media }}
