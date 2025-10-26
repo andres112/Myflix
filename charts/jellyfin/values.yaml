@@ -22,7 +22,6 @@ resources:
   limits:
     cpu: 2000m
     memory: 2Gi
-    gpu: 1
 
 ingress:
   enabled: true

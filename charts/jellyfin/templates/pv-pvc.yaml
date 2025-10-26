@@ -16,6 +16,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jellyfin-config
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "jellyfin.labels" . | nindent 4 }}
 spec:
@@ -23,6 +24,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: ""
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -42,6 +44,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jellyfin-cache
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "jellyfin.labels" . | nindent 4 }}
 spec:
@@ -49,4 +52,5 @@ spec:
   resources:
     requests:
       storage: 5Gi
+  storageClassName: ""
 ---

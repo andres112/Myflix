@@ -61,9 +61,15 @@ Deploy each Helm chart individually. Example for Jellyfin:
 
 ```bash
 ssh <your-user>@<your-server-host>
-cd ~/myflix
-kubectl create namespace myflix # if not already created
-helm install jellyfin ./charts/jellyfin -n myflix
+cd ~/myflix/charts/jellyfin
+helm upgrade --install jellyfin . \
+  --namespace myflix \
+  --create-namespace \
+  --atomic \
+  --timeout 5m \
+  --wait \
+  --history-max 3
+
 
 # For Traefik, use the appropriate Helm repo and install command
 helm repo add traefik https://traefik.github.io/charts helm repo update helm install traefik traefik/traefik \ --namespace kube-system \ --set service.type=ClusterIP \ --set ingressClass.enabled=true \ --set ingressClass.isDefaultClass=true

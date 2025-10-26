@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "jellyfin.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "jellyfin.labels" . | nindent 4 }}
 spec:
@@ -41,7 +42,6 @@ spec:
             limits:
               cpu: {{ .Values.resources.limits.cpu }}
               memory: {{ .Values.resources.limits.memory }}
-              gpu.intel.com/i915: {{ .Values.resources.limits.gpu }}
           securityContext:
             privileged: true
       volumes:
