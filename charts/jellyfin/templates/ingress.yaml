@@ -8,7 +8,6 @@ metadata:
     {{- include "jellyfin.labels" . | nindent 4 }}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-secure-headers@kubernetescrd
 spec:
   rules:
     - host: {{ .Values.ingress.host }}
