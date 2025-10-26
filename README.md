@@ -16,7 +16,7 @@ It deploys Jellyfin with GPU acceleration and Traefik as the ingress controller.
 
 - K3s single node
 - Namespace: `myflix`
-- Helm v3 used for deployment
+- Helm v3 used for deployment (charts managed individually, not via helmfile)
 
 ---
 
@@ -24,7 +24,6 @@ It deploys Jellyfin with GPU acceleration and Traefik as the ingress controller.
 
 ```
 myflix/
-├─ helmfile.yaml
 ├─ charts/
 │  ├─ traefik/ (fetched from Helm repo)
 │  └─ jellyfin/
@@ -58,11 +57,16 @@ scp -r ~/projects/myflix <your-user>@<your-server-ip>:~/myflix
 
 ### 3. Deploy
 
+Deploy each Helm chart individually. Example for Jellyfin:
+
 ```bash
 ssh <your-user>@<your-server-host>
 cd ~/myflix
-kubectl create namespace myflix
-helmfile apply
+kubectl create namespace myflix # if not already created
+helm install jellyfin ./charts/jellyfin -n myflix
+
+# For Traefik, use the appropriate Helm repo and install command
+helm repo add traefik https://traefik.github.io/charts helm repo update helm install traefik traefik/traefik \ --namespace kube-system \ --set service.type=ClusterIP \ --set ingressClass.enabled=true \ --set ingressClass.isDefaultClass=true
 ```
 
 ---
