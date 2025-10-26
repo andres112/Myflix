@@ -1,2 +1,61 @@
-# deployment.yaml for Jellyfin
-# Kubernetes Deployment manifest goes here
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jellyfin.fullname" . }}
+  labels:
+    {{- include "jellyfin.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "jellyfin.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "jellyfin.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: jellyfin
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: cache
+              mountPath: /cache
+            - name: media
+              mountPath: /media
+              readOnly: true
+						{{- if .Values.persistence.fonts.enabled }}
+            - name: fonts
+              mountPath: /usr/local/share/fonts/custom
+              readOnly: true
+            {{- end }}
+          resources:
+						requests:
+							cpu: {{ .Values.resources.requests.cpu }}
+							memory: {{ .Values.resources.requests.memory }}
+						limits:
+							cpu: {{ .Values.resources.limits.cpu }}
+							memory: {{ .Values.resources.limits.memory }}
+							gpu.intel.com/i915: {{ .Values.resources.limits.gpu }}
+          securityContext:
+            privileged: true
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: jellyfin-config
+        - name: cache
+          persistentVolumeClaim:
+            claimName: jellyfin-cache
+        - name: media
+          hostPath:
+            path: {{ .Values.persistence.media }}
+				{{- if .Values.persistence.fonts.enabled }}
+        - name: fonts
+          hostPath:
+            path: {{ .Values.persistence.fonts.path }}
+        {{- end }}

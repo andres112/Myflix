@@ -1,5 +1,6 @@
-# Chart.yaml for Jellyfin Helm chart
 apiVersion: v2
 name: jellyfin
+description: Self-hosted media system
+type: application
 version: 0.1.0
-description: A Helm chart for deploying Jellyfin
+appVersion: "latest"

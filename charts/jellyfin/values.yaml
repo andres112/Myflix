@@ -1,2 +1,29 @@
-# values.yaml for Jellyfin Helm chart
-# Add your default values here
+image:
+  repository: jellyfin/jellyfin
+  tag: 10.11
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8096
+
+persistence:
+  config: /srv/jellyfin/config
+  cache: /srv/jellyfin/cache
+  media: /srv/media
+  fonts:
+    enabled: true
+    path: /srv/jellyfin/fonts
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+    gpu: 1
+
+ingress:
+  enabled: true
+  host: jellyfin.local.lan

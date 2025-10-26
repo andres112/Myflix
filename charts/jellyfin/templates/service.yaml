@@ -1,2 +1,15 @@
-# service.yaml for Jellyfin
-# Kubernetes Service manifest goes here
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "jellyfin.fullname" . }}
+  labels:
+    {{- include "jellyfin.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ include "jellyfin.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
