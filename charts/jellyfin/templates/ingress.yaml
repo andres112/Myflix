@@ -10,14 +10,16 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-    - host: {{ .Values.ingress.host }}
+  {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ include "jellyfin.fullname" . }}-svc
+                name: {{ include "jellyfin.fullname" $ }}-svc
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ $.Values.service.port }}
+  {{- end }}
 {{- end }}

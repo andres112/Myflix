@@ -28,4 +28,6 @@ resources:
 
 ingress:
   enabled: true
-  host: jellyfin.local.lan
+  hosts:
+    - jellyfin.local.lan
+    - cine.goldenflix.win
