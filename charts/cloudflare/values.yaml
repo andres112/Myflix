@@ -1,0 +1,26 @@
+# --- Basic metadata ---
+namespace: myflix
+
+# --- Cloudflare Tunnel ---
+tunnelId: "66eb76a5-b6b8-45f1-87a5-d4d4f6753115"
+hostname: "cine.goldenflix.win"
+traefikNamespace: "traefik"
+
+# --- Image version ---
+image:
+  repository: cloudflare/cloudflared
+  tag: "2025.10.0"
+
+# --- Resources (adjust as needed) ---
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+# --- Secret and config file paths inside container ---
+paths:
+  credentials: /etc/cloudflared/creds/credentials.json
+  config: /etc/cloudflared/config/config.yaml
