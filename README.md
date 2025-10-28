@@ -13,11 +13,12 @@ Networking and security are configured for both local and future Cloudflare-tunn
 - **OS:** Ubuntu 24.04 Desktop
 - **Hostname:** `<your-hostname>`, user `<your-user>`
 - **Static IP:** `<your-server-ip>`
-- **Security:** SSH key-only, 2-factor PAM, UFW + Fail2Ban
+- **Security:** SSH key-only, 2-factor PAM, UFW (without limit local-network) + Fail2Ban
 - **Storage:**
   ```
   /srv/jellyfin/config
   /srv/jellyfin/cache
+  /srv/jellygin/fonts
   /srv/media
   ```
 - **GPU:** Intel HD Graphics 620 → `/dev/dri/{card1,renderD128}`
@@ -93,7 +94,16 @@ scp -r ~/projects/myflix <your-user>@<your-server-ip>:~/myflix
 ```bash
 helm repo add traefik https://traefik.github.io/charts
 helm repo update
-helm install traefik traefik/traefik   -n kube-system   --set service.type=NodePort   --set providers.kubernetesIngress.enabled=true   --set ingressClass.enabled=true   --set ingressClass.isDefaultClass=true
+
+helm upgrade --install traefik traefik/traefik \
+  --namespace traefik \
+  --create-namespace \
+  --set service.type=NodePort \
+  --set ports.web.nodePort=30080 \
+  --set ports.websecure.nodePort=30443 \
+  --set logs.general.level=INFO \
+  --set ingressClass.enabled=true \
+  --set ingressClass.isDefaultClass=true
 ```
 
 ### 5. Deploy Jellyfin

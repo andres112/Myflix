@@ -28,6 +28,7 @@ resources:
 
 ingress:
   enabled: true
+  className: traefik
   hosts:
     - jellyfin.local.lan
     - cine.goldenflix.win
