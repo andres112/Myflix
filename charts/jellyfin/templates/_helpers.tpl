@@ -22,11 +22,11 @@ Common labels for all resources.
 {{- define "jellyfin.labels" -}}
 app.kubernetes.io/name: {{ include "jellyfin.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/version: {{ .Chart.AppVersion }}
+app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
 app.kubernetes.io/component: media-server
 app.kubernetes.io/part-of: myflix-stack
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 {{- end -}}
 
 {{/*

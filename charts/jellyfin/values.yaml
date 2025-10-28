@@ -1,3 +1,6 @@
+# --- Basic metadata ---
+namespace: myflix
+
 fullnameOverride: jellyfin
 nameOverride: jellyfin
 traefikNamespace: traefik

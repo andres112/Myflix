@@ -9,9 +9,15 @@ data:
   config.yaml: |
     tunnel: {{ .Values.tunnelId }}
     credentials-file: {{ .Values.paths.credentials }}
+
     ingress:
       - hostname: {{ .Values.hostname }}
-        service: http://traefik.{{ .Values.traefikNamespace }}.svc.cluster.local:80
+        service: https://traefik.{{ .Values.traefikNamespace }}.svc.cluster.local:443
+        originRequest:
+          originServerName: {{ .Values.hostname }}   # SNI → matches origin cert CN/SAN
+          httpHostHeader: {{ .Values.hostname }}     # keep Host header consistent
+          # noTLSVerify: true                        # uncomment only for test/debug
       - service: http_status:404
+
     metrics: 0.0.0.0:2000
     no-autoupdate: true

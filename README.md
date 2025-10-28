@@ -111,7 +111,8 @@ helm upgrade --install traefik traefik/traefik \
   --set ports.websecure.nodePort=30443 \
   --set logs.general.level=INFO \
   --set ingressClass.enabled=true \
-  --set ingressClass.isDefaultClass=true
+  --set ingressClass.isDefaultClass=true \
+  --set providers.kubernetesCRD.allowCrossNamespace=true
 ```
 
 ### 5. Deploy Jellyfin
@@ -237,7 +238,11 @@ kubectl -n myflix create secret generic cloudflared-credentials \
 
 # Deploy using Helm
 cd ~/myflix/charts/cloudflare
-helm upgrade --install cloudflare . -n myflix --atomic --wait
+helm upgrade --install cloudflare . -n myflix \
+--atomic \
+--wait \
+--timeout 5m \
+--history-max 5
 ```
 
 Verify deployment:
