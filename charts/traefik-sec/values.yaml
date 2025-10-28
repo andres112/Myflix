@@ -1,6 +1,8 @@
 # Namespace where traefik-sec middleware will be deployed
-# This should typically match where Traefik is installed
 namespace: traefik
+
+# Enable relaxed CSP rules for first-time setups (e.g. Jellyfin wizard)
+setupMode: true
 
 hosts:
   - cine.goldenflix.win
@@ -11,14 +13,28 @@ headers:
   preload: true
   referrerPolicy: "strict-origin-when-cross-origin"
   frameDeny: true
-  contentSecurityPolicy: >
+  contentSecurityPolicy: |
+    {{- if .Values.setupMode }}
     default-src 'self';
     img-src 'self' data: blob:;
     media-src 'self' blob:;
     style-src 'self' 'unsafe-inline';
-    script-src 'self';
+    script-src 'self' 'unsafe-inline' blob:;
     connect-src 'self' ws: wss:;
     font-src 'self' data:;
     object-src 'none';
     frame-ancestors 'none';
     base-uri 'self';
+    {{- else }}
+    default-src 'self';
+    img-src 'self' https://image.tmdb.org https://m.media-amazon.com data: blob:;
+    media-src 'self' blob:;
+    style-src 'self' 'unsafe-inline';
+    script-src 'self' blob: https://www.youtube.com;
+    connect-src 'self' ws: wss:;
+    frame-src 'self' https://www.youtube.com;
+    font-src 'self' data:;
+    object-src 'none';
+    frame-ancestors 'none';
+    base-uri 'self';
+    {{- end }}

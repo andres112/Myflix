@@ -14,4 +14,4 @@ spec:
     frameDeny: {{ .Values.headers.frameDeny }}
     browserXssFilter: true
     contentTypeNosniff: true
-    contentSecurityPolicy: {{ .Values.headers.contentSecurityPolicy | quote }}
+    contentSecurityPolicy: {{ tpl .Values.headers.contentSecurityPolicy . | quote }}

@@ -127,6 +127,30 @@ helm upgrade --install jellyfin . \
   --history-max 5
 ```
 
+### 6. Deploy Traefik secure middleware
+
+```bash
+cd ~/myflix/charts/traefik-sec
+helm upgrade --install traefik-sec . \
+  --namespace traefik \
+  --set setupMode=true \
+  --atomic \
+  --wait \
+  --timeout 5m \
+  --history-max 5
+```
+Complete Jellyfin’s wizard, then tighten again:
+
+```bash
+helm upgrade traefik-sec . \
+  --namespace traefik \
+  --set setupMode=false \
+  --atomic \
+  --wait \
+  --timeout 5m \
+  --history-max 5
+```
+
 ---
 
 ## Verification
