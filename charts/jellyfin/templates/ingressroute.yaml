@@ -1,0 +1,23 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "jellyfin.fullname" . }}-route
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "jellyfin.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`{{ (index .Values.ingress.hosts 0) }}`)
+      kind: Rule
+      services:
+        - name: {{ include "jellyfin.fullname" $ }}-svc
+          port: {{ $.Values.service.port }}
+      middlewares:
+        - name: {{ include "traefik-sec.fullname" . }}-headers
+          namespace: {{ .Values.traefikNamespace }}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName }}
+{{- end }}

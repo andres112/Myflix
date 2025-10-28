@@ -119,7 +119,12 @@ helm upgrade --install traefik traefik/traefik \
 ```bash
 kubectl create namespace myflix
 cd ~/myflix/charts/jellyfin
-helm upgrade --install jellyfin .   --namespace myflix   --atomic --wait --timeout 5m --history-max 5
+helm upgrade --install jellyfin . \
+  --namespace myflix \
+  --atomic \
+  --wait \
+  --timeout 5m \
+  --history-max 5
 ```
 
 ---

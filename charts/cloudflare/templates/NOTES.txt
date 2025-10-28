@@ -1,0 +1,24 @@
+Cloudflare Tunnel has been deployed successfully!
+
+IMPORTANT: Ensure the 'cloudflared-credentials' secret exists in the {{ .Values.namespace }} namespace
+before the pod can start. See templates/secret.yaml for creation instructions.
+
+Check deployment status:
+  kubectl get deployment -n {{ .Values.namespace }} -l app.kubernetes.io/name={{ include "cloudflare.name" . }}
+  kubectl get pods -n {{ .Values.namespace }} -l app.kubernetes.io/name={{ include "cloudflare.name" . }}
+
+Check configuration:
+  kubectl get configmap {{ include "cloudflare.name" . }}-config -n {{ .Values.namespace }}
+  kubectl get secret cloudflared-credentials -n {{ .Values.namespace }}
+  kubectl get serviceaccount {{ include "cloudflare.name" . }}-sa -n {{ .Values.namespace }}
+
+View tunnel logs:
+  kubectl logs -n {{ .Values.namespace }} -l app.kubernetes.io/name={{ include "cloudflare.name" . }} --follow
+
+Verify tunnel connectivity:
+  kubectl logs -n {{ .Values.namespace }} -l app.kubernetes.io/name={{ include "cloudflare.name" . }} | grep -i "connection"
+
+Test external access:
+  https://{{ .Values.hostname }}
+
+Your tunnel should be routing traffic from {{ .Values.hostname }} to the Traefik ingress controller in the {{ .Values.traefikNamespace }} namespace.

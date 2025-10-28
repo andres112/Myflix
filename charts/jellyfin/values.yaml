@@ -1,5 +1,6 @@
 fullnameOverride: jellyfin
 nameOverride: jellyfin
+traefikNamespace: traefik
 
 image:
   repository: jellyfin/jellyfin
@@ -28,6 +29,7 @@ resources:
 
 ingress:
   enabled: true
-  className: traefik
   hosts:
     - cine.goldenflix.win
+  tls:
+    secretName: tls-origin-cert

@@ -1,0 +1,38 @@
+Jellyfin Media Server has been deployed successfully!
+
+Check deployment status:
+  kubectl get deployment -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "jellyfin.name" . }}
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "jellyfin.name" . }}
+
+Check service and networking:
+  kubectl get service {{ include "jellyfin.fullname" . }}-svc -n {{ .Release.Namespace }}
+  kubectl get ingressroute -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "jellyfin.name" . }}
+
+Check persistent storage:
+  kubectl get pvc -n {{ .Release.Namespace }}
+  kubectl get pv | grep jellyfin
+
+View application logs:
+  kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "jellyfin.name" . }} --follow
+
+Verify security headers:
+  kubectl get middleware -n {{ .Values.traefikNamespace }} {{ include "traefik-sec.fullname" . }}-headers
+
+Test access in browser:
+  https://{{ (index .Values.ingress.hosts 0) }}
+
+Expected results:
+  ✓ Valid TLS certificate (padlock icon)
+  ✓ HSTS and security headers (configured via traefik-sec middleware)
+  ✓ Content Security Policy headers
+  ✓ Jellyfin welcome/login screen
+
+Troubleshooting:
+  # Check if pod is running
+  kubectl describe pod -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "jellyfin.name" . }}
+  
+  # Verify PVC bindings
+  kubectl describe pvc -n {{ .Release.Namespace }}
+  
+  # Check Traefik routing
+  kubectl logs -n {{ .Values.traefikNamespace }} -l app.kubernetes.io/name=traefik

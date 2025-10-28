@@ -1,9 +1,11 @@
-namespace: myflix
-tls:
-  secretName: tls-origin-cert   # already created in namespace traefik
-  host: cine.goldenflix.win
+# Namespace where traefik-sec middleware will be deployed
+# This should typically match where Traefik is installed
+namespace: traefik
 
-securityHeaders:
+hosts:
+  - cine.goldenflix.win
+
+headers:
   hstsSeconds: 31536000
   includeSubdomains: true
   preload: true

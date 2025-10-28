@@ -1,9 +1,36 @@
-The Traefik security configuration has been applied.
+Traefik Security Middleware has been applied successfully!
 
-Check:
-  kubectl get ingressroute -n {{ .Values.jellyfin.namespace }}
-  kubectl get middleware -n {{ .Values.traefikNamespace }}
+Check middleware configuration:
+  kubectl get middleware {{ include "traefik-sec.fullname" . }}-headers -n {{ .Values.namespace }}
+  kubectl describe middleware {{ include "traefik-sec.fullname" . }}-headers -n {{ .Values.namespace }}
 
-Verify in browser:
-  https://{{ (index .Values.tls.hosts 0) }}
-Should return Jellyfin with valid padlock and proper HSTS/CSP headers.
+Configured security headers:
+  ✓ HSTS (HTTP Strict Transport Security): {{ .Values.headers.hstsSeconds }} seconds
+  ✓ HSTS Subdomains: {{ .Values.headers.includeSubdomains }}
+  ✓ HSTS Preload: {{ .Values.headers.preload }}
+  ✓ Referrer Policy: {{ .Values.headers.referrerPolicy }}
+  ✓ Frame Deny: {{ .Values.headers.frameDeny }}
+  ✓ Browser XSS Filter: Enabled
+  ✓ Content Type Nosniff: Enabled
+  ✓ Content Security Policy: Configured
+
+Verify headers are applied:
+  # Test with curl (replace with your actual domain)
+  curl -I https://{{ (index .Values.hosts 0) }}
+
+  # Expected headers in response:
+  # - Strict-Transport-Security: max-age={{ .Values.headers.hstsSeconds }}{{ if .Values.headers.includeSubdomains }}; includeSubDomains{{ end }}{{ if .Values.headers.preload }}; preload{{ end }}
+  # - X-Frame-Options: DENY
+  # - X-Content-Type-Options: nosniff
+  # - Referrer-Policy: {{ .Values.headers.referrerPolicy }}
+  # - Content-Security-Policy: [configured policy]
+
+Test security headers online:
+  https://securityheaders.com
+  https://observatory.mozilla.org
+
+Note: This middleware must be referenced in your IngressRoute to take effect.
+Example IngressRoute configuration:
+  middlewares:
+    - name: {{ include "traefik-sec.fullname" . }}-headers
+      namespace: {{ .Values.namespace }}
