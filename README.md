@@ -45,7 +45,6 @@ myflix/
 │  │   ├─ Chart.yaml
 │  │   ├─ values.yaml
 │  │   └─ templates/
-│  │       ├─ ingressroute.yaml
 │  │       ├─ middleware.yaml
 │  │       ├─ _helpers.tpl
 │  │       └─ NOTES.txt
@@ -64,7 +63,7 @@ myflix/
 │      └─ templates/
 │          ├─ deployment.yaml
 │          ├─ service.yaml
-│          ├─ ingress.yaml
+│          ├─ ingressroute.yaml
 │          ├─ pv-pvc.yaml
 │          └─ _helpers.tpl
 └─ README.md
@@ -292,13 +291,151 @@ Expected result: `404 Not Found` or `302 Found` from Traefik�
 
 ---
 
-### Current State (Phase 6 Complete)
+## Phase 7 – Full‑Strict TLS and Security Hardening
 
-- ✅ Cloudflare Tunnel deployed and stable  
-- ✅ Traefik reachable internally through tunnel  
-- ✅ Jellyfin accessible through Cloudflare edge domain  
-- ✅ Public access temporarily blocked via WAF  
-- ✅ Ready for Phase 7 – Full‑Strict TLS and Security Middlewares
+### Objective
+Implement **end‑to‑end encryption** (Cloudflare → Traefik → Jellyfin) with a Cloudflare Origin Certificate, migrate from basic Ingress to **Traefik IngressRoute CRDs**, and enforce hardened security headers.
 
 ---
 
+### Implementation Summary
+
+| Step | Task | Result |
+|------|------|---------|
+| 1 | Generated Cloudflare Origin Certificate for `cine.goldenflix.win` | ✅ Stored as Kubernetes TLS Secret (`tls-origin-cert`) in `myflix` namespace |
+| 2 | Created `charts/traefik-sec` Helm chart for security middlewares (HSTS, CSP, X‑Frame‑Options, Referrer‑Policy) | ✅ |
+| 3 | Moved Traefik deployment to its own namespace `traefik` | ✅ Isolation for ingress controller |
+| 4 | Converted Jellyfin Ingress to `IngressRoute` resource | ✅ TLS and middleware integration |
+| 5 | Enabled `allowCrossNamespace` for Traefik CRD provider | ✅ Allowed middleware in `traefik` to be used by routes in `myflix` |
+| 6 | Reconfigured Cloudflare Tunnel to use `https://traefik.traefik.svc.cluster.local:443` with SNI `cine.goldenflix.win` | ✅ EntryPoint alignment → 404 resolved |
+| 7 | Validated TLS padlock and browser trust chain | ✅ Cloudflare Edge Cert → Origin Cert verified |
+| 8 | Tested with Zero Trust disabled and confirmed `302 → 200 OK` responses from Jellyfin | ✅ |
+
+---
+
+### Helm Changes (Summary)
+
+**Jellyfin IngressRoute**
+```yaml
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`cine.goldenflix.win`)
+      kind: Rule
+      services:
+        - name: jellyfin-svc
+          port: 8096
+      middlewares:
+        - name: traefik-sec-headers
+          namespace: traefik
+  tls:
+    secretName: tls-origin-cert
+```
+
+**Traefik‑Sec Middleware**
+```yaml
+spec:
+  headers:
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    stsPreload: true
+    referrerPolicy: strict-origin-when-cross-origin
+    frameDeny: true
+    contentTypeNosniff: true
+    browserXssFilter: true
+    contentSecurityPolicy: >
+      default-src 'self'; img-src 'self' data: blob:;
+      media-src 'self' blob:;
+      style-src 'self' 'unsafe-inline';
+      script-src 'self';
+      connect-src 'self' ws: wss:;
+      font-src 'self' data:;
+      object-src 'none';
+      frame-ancestors 'none';
+      base-uri 'self';
+```
+
+**Cloudflare ConfigMap (Refactored)**
+```yaml
+ingress:
+  - hostname: cine.goldenflix.win
+    service: https://traefik.traefik.svc.cluster.local:443
+    originRequest:
+      originServerName: cine.goldenflix.win
+      httpHostHeader: cine.goldenflix.win
+  - service: http_status:404
+```
+
+---
+
+### Troubleshooting and Fixes (Log Chronicle)
+
+| Problem | Symptom | Root Cause / Resolution |
+|----------|----------|------------------------|
+| IngressRoute ignored by Traefik | `kubernetes service not found: myflix/jellyfin-svc` | Traefik was watching only `traefik` namespace → set `providers.kubernetesCRD.namespaces=[]` to watch all just deleting from ARGS |
+| Middleware not applied | `middleware not in IngressRoute namespace` | Enabled `allowCrossNamespace=true` |
+| Duplicate middleware name (`traefik-sec-traefik-sec-headers`) | Helper used `.Release.Name` twice | Simplified template to static `traefik-sec-headers` |
+| 404 via Cloudflare | Tunnel was targeting `http://...:80` (web entryPoint) | Switched to `https://...:443` (websecure entryPoint) |
+| TLS origin cert validation error | Padlock missing or untrusted | Created Cloudflare Origin Cert for `cine.goldenflix.win` and stored as K8s Secret |
+| Log visibility too low | No info for requests | Enabled `log.level=DEBUG` and access logs in Helm values |
+
+---
+
+### Verification Commands (Phase 7)
+
+```bash
+kubectl logs -n traefik deploy/traefik | grep cine.goldenflix.win
+curl -IL --ssl-no-revoke https://cine.goldenflix.win # From windows terminal
+openssl s_client -connect cine.goldenflix.win:443 -servername cine.goldenflix.win </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -dates
+```
+
+Expected results: `302 → 200 OK` from Jellyfin and security headers present.
+
+---
+
+### Security Notes
+
+- Store the Cloudflare Origin certificate (`tls-origin-cert`) as:
+  ```bash
+  kubectl create secret tls tls-origin-cert     --cert=origin.crt     --key=origin.key     -n myflix
+  ```
+- Cloudflare Tunnel credential JSON:
+  ```bash
+  kubectl -n myflix create secret generic cloudflared-credentials     --from-file=credentials.json=/tmp/<TUNNEL_ID>.json
+  ```
+- No public ports exposed on router — outbound connections only.
+- TLS chain: Cloudflare Edge Cert → Origin Cert → Traefik → Pod.
+
+---
+
+### Current State (Phase 7 Complete)
+
+- ✅ End‑to‑end TLS validated (Full Strict mode)  
+- ✅ IngressRoute and middleware deployed via Helm  
+- ✅ Cloudflare Tunnel refactored to HTTPS origin  
+- ✅ Security headers enforced at edge and origin  
+- ✅ Zero Trust ready for next phase  
+
+---
+
+## Lessons Learned
+
+- Ensure Traefik watches all namespaces for IngressRoutes and CRDs.  
+- Confirm entryPoint alignment (`web` vs `websecure`).  
+- Origin certificates must match the SNI hostname.  
+- `allowCrossNamespace=true` is vital for shared middlewares.  
+- Enable `api.insecure=true` only for temporary debugging.  
+- Security is an iterative discipline.
+
+---
+
+### Next Phases
+
+8. GitOps Integration (ArgoCD / Flux)  
+9. Backup Strategy with free storage tiers  
+10. Observability with Prometheus + Loki  
+
+---
+
+© 2025 Home Media Server Project
