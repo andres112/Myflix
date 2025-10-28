@@ -6,7 +6,7 @@ metadata:
     {{- include "jellyfin.labels" . | nindent 4 }}
 spec:
   capacity:
-    storage: 1Gi
+    storage: 3Gi
   accessModes: ["ReadWriteOnce"]
   persistentVolumeReclaimPolicy: Retain
   claimRef:
@@ -22,11 +22,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "jellyfin.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 1Gi
+      storage: 3Gi
   storageClassName: ""
 ---
 apiVersion: v1
@@ -37,7 +39,7 @@ metadata:
     {{- include "jellyfin.labels" . | nindent 4 }}
 spec:
   capacity:
-    storage: 5Gi
+    storage: 7Gi
   accessModes: ["ReadWriteOnce"]
   persistentVolumeReclaimPolicy: Retain
   claimRef:
@@ -53,10 +55,12 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "jellyfin.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 5Gi
+      storage: 7Gi
   storageClassName: ""
 ---
