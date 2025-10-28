@@ -1,0 +1,22 @@
+namespace: myflix
+tls:
+  secretName: tls-origin-cert   # already created in namespace traefik
+  host: cine.goldenflix.win
+
+securityHeaders:
+  hstsSeconds: 31536000
+  includeSubdomains: true
+  preload: true
+  referrerPolicy: "strict-origin-when-cross-origin"
+  frameDeny: true
+  contentSecurityPolicy: >
+    default-src 'self';
+    img-src 'self' data: blob:;
+    media-src 'self' blob:;
+    style-src 'self' 'unsafe-inline';
+    script-src 'self';
+    connect-src 'self' ws: wss:;
+    font-src 'self' data:;
+    object-src 'none';
+    frame-ancestors 'none';
+    base-uri 'self';

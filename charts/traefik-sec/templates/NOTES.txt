@@ -1,0 +1,9 @@
+The Traefik security configuration has been applied.
+
+Check:
+  kubectl get ingressroute -n {{ .Values.jellyfin.namespace }}
+  kubectl get middleware -n {{ .Values.traefikNamespace }}
+
+Verify in browser:
+  https://{{ (index .Values.tls.hosts 0) }}
+Should return Jellyfin with valid padlock and proper HSTS/CSP headers.

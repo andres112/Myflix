@@ -41,7 +41,14 @@ Networking and security are configured for both local and future Cloudflare-tunn
 ```
 myflix/
 ├─ charts/
-│  ├─ traefik/       (installed from upstream repo)
+│  ├─ traefik-sec/
+│  │   ├─ Chart.yaml
+│  │   ├─ values.yaml
+│  │   └─ templates/
+│  │       ├─ ingressroute.yaml
+│  │       ├─ middleware.yaml
+│  │       ├─ _helpers.tpl
+│  │       └─ NOTES.txt
 │  ├─ cloudflare/
 │  │   ├─ Chart.yaml
 │  │   ├─ values.yaml
@@ -60,6 +67,7 @@ myflix/
 │          ├─ ingress.yaml
 │          ├─ pv-pvc.yaml
 │          └─ _helpers.tpl
+└─ README.md
 ```
 
 ---
@@ -209,7 +217,7 @@ The tunnel is deployed as a Helm‑managed pod using the `charts/cloudflare` cha
 | 7 | Built Helm chart (`charts/cloudflare`) with Deployment + ServiceAccount | ✅ |
 | 8 | Set `service: http://traefik.kube-system.svc.cluster.local:80` in ConfigMap | ✅ |
 | 9 | Verified tunnel logs – connected via QUIC to Cloudflare regions (ZRH, AMS) | ✅ |
-| 10 | Updated Jellyfin Ingress hosts (`jellyfin.local.lan`, `cine.goldenflix.win`) | ✅ |
+| 10 | Updated Jellyfin Ingress hosts (`cine.goldenflix.win`) | ✅ |
 | 11 | Access through browser at `https://cine.goldenflix.win` confirmed | ✅ |
 | 12 | Applied Cloudflare WAF rule to temporarily block public traffic | ✅ |
 

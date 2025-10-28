@@ -1,0 +1,6 @@
+apiVersion: v2
+name: traefik-sec
+description: Adds TLS (Cloudflare Origin Certificate) and browser security headers to Traefik v3 running in namespace traefik.
+type: application
+version: 0.1.0
+appVersion: "3.0"
