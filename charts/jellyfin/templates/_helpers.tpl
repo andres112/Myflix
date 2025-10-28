@@ -34,5 +34,5 @@ Return a compatible fully qualified name for traefik-sec resources
 This helper is used to reference the traefik-sec middleware from other charts
 */}}
 {{- define "traefik-sec.fullname" -}}
-{{- printf "%s-%s" .Release.Name "traefik-sec" | trunc 63 | trimSuffix "-" -}}
+traefik-sec
 {{- end -}}

@@ -24,3 +24,7 @@ resources:
 paths:
   credentials: /etc/cloudflared/creds/credentials.json
   config: /etc/cloudflared/config/config.yaml
+
+# --- Secret management - created manually ---
+secret:
+  create: false

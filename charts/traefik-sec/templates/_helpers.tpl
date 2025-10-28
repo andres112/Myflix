@@ -2,7 +2,7 @@
 Return a fully qualified name for resources
 */}}
 {{- define "traefik-sec.fullname" -}}
-{{- printf "%s-%s" .Release.Name "traefik-sec" | trunc 63 | trimSuffix "-" -}}
+traefik-sec
 {{- end -}}
 
 {{/*
