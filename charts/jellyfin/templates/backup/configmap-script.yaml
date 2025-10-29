@@ -1,0 +1,41 @@
+{{- if .Values.backup.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-script
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "jellyfin.labels" . | nindent 4 }}
+data:
+  backup.sh: |
+    #!/bin/bash
+    set -e
+    TIMESTAMP=$(date +%Y%m%d-%H%M)
+    TMP_DIR="/tmp/myflix-backup-$TIMESTAMP"
+    DEST="r2:{{ .Values.backup.r2Bucket }}"
+    mkdir -p "$TMP_DIR"
+
+    echo "Starting Jellyfin config backup at $(date)"
+
+    # 1. Archive only config folder (includes SQLite DB)
+    tar -czf "$TMP_DIR/jellyfin-config.tar.gz" -C /srv/jellyfin config
+
+    # 2. Upload to R2
+    rclone copy "$TMP_DIR" "$DEST/$TIMESTAMP" --progress
+
+    # 3. Retention policy: keep {{ .Values.backup.retention.daily }} daily and {{ .Values.backup.retention.weekly }} weekly
+    BACKUPS=$(rclone lsf "$DEST" --dirs-only | sort -r)
+    DAILY=$(echo "$BACKUPS" | head -n {{ .Values.backup.retention.daily }})
+    WEEKLY=$(echo "$BACKUPS" | grep "$(date +%Y%W)" | head -n {{ .Values.backup.retention.weekly }})
+    KEEP=$(echo -e "$DAILY\n$WEEKLY" | sort -u)
+
+    for DIR in $BACKUPS; do
+      if ! echo "$KEEP" | grep -q "$DIR"; then
+        echo "Purging old backup: $DIR"
+        rclone purge "$DEST/$DIR" || true
+      fi
+    done
+
+    rm -rf "$TMP_DIR"
+    echo "Backup finished successfully at $(date)"
+{{- end }}

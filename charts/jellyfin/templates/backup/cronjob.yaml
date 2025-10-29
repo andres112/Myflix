@@ -1,0 +1,43 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: myflix-backup
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "jellyfin.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ .Values.backup.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: backup-runner
+          restartPolicy: OnFailure
+          containers:
+            - name: rclone-backup
+              image: alpine:3.20
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  apk add --no-cache rclone tar gzip sqlite ca-certificates
+                  chmod +x /scripts/backup.sh
+                  /scripts/backup.sh
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.backup.r2SecretName }}
+              volumeMounts:
+                - name: jellyfin-config
+                  mountPath: /srv/jellyfin/config
+                - name: backup-script
+                  mountPath: /scripts
+          volumes:
+            - name: jellyfin-config
+              hostPath:
+                path: /srv/jellyfin/config
+            - name: backup-script
+              configMap:
+                name: backup-script
+{{- end }}

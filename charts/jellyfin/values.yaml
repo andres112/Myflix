@@ -37,3 +37,13 @@ ingress:
     - jf-7f4b2c9a2d.goldenflix.win # For exclusive use of app clients
   tls:
     secretName: tls-origin-cert
+    
+backup:
+  enabled: true
+  schedule: "0 3 * * *"          # 03:00 every night
+  r2Bucket: "myflix-backups"
+  retention:
+    daily: 3
+    weekly: 2
+  r2SecretName: rclone-r2-secret
+
