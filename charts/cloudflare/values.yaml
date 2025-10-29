@@ -3,7 +3,9 @@ namespace: myflix
 
 # --- Cloudflare Tunnel ---
 tunnelId: "66eb76a5-b6b8-45f1-87a5-d4d4f6753115"
-hostname: "cine.goldenflix.win"
+hostnames: 
+  - "cine.goldenflix.win"
+  - "jf-7f4b2c9a2d.goldenflix.win" # For exclusive use of app clients
 traefikNamespace: "traefik"
 
 # --- Image version ---

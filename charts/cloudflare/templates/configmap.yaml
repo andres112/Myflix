@@ -11,12 +11,13 @@ data:
     credentials-file: {{ .Values.paths.credentials }}
 
     ingress:
-      - hostname: {{ .Values.hostname }}
-        service: https://traefik.{{ .Values.traefikNamespace }}.svc.cluster.local:443
+    {{- range .Values.hostnames }}
+      - hostname: {{ . }}
+        service: https://traefik.{{ $.Values.traefikNamespace }}.svc.cluster.local:443
         originRequest:
-          originServerName: {{ .Values.hostname }}   # SNI → matches origin cert CN/SAN
-          httpHostHeader: {{ .Values.hostname }}     # keep Host header consistent
-          # noTLSVerify: true                        # uncomment only for test/debug
+          originServerName: {{ . }} # SNI → matches origin cert CN/SAN
+          httpHostHeader: {{ . }}   # keep Host header consistent
+    {{- end }}
       - service: http_status:404
 
     metrics: 0.0.0.0:2000
