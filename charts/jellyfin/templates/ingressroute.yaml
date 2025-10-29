@@ -10,7 +10,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`{{ (index .Values.ingress.hosts 0) }}`)
+    - match: Host(`{{ join "`) || Host(`" .Values.ingress.hosts }}`)
       kind: Rule
       services:
         - name: {{ include "jellyfin.fullname" . }}-svc

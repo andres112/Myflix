@@ -16,7 +16,7 @@ Configured security headers:
 
 Verify headers are applied:
   # Test with curl (replace with your actual domain)
-  curl -I https://{{ (index .Values.hosts 0) }}
+  curl -I https://domain
 
   # Expected headers in response:
   # - Strict-Transport-Security: max-age={{ .Values.headers.hstsSeconds }}{{ if .Values.headers.includeSubdomains }}; includeSubDomains{{ end }}{{ if .Values.headers.preload }}; preload{{ end }}

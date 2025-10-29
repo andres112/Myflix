@@ -4,9 +4,6 @@ namespace: traefik
 # Enable relaxed CSP rules for first-time setups (e.g. Jellyfin wizard)
 setupMode: true
 
-hosts:
-  - cine.goldenflix.win
-
 headers:
   hstsSeconds: 31536000
   includeSubdomains: true
@@ -27,7 +24,7 @@ headers:
     base-uri 'self';
     {{- else }}
     default-src 'self';
-    img-src 'self' https://image.tmdb.org https://m.media-amazon.com data: blob:;
+    img-src 'self' https://image.tmdb.org https://m.media-amazon.com https://i.ytimg.com data: blob:;
     media-src 'self' blob:;
     style-src 'self' 'unsafe-inline';
     script-src 'self' blob: https://www.youtube.com;

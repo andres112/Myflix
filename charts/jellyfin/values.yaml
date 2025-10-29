@@ -34,5 +34,6 @@ ingress:
   enabled: true
   hosts:
     - cine.goldenflix.win
+    - jf-7f4b2c9a2d.goldenflix.win # For exclusive use of app clients
   tls:
     secretName: tls-origin-cert
