@@ -123,7 +123,7 @@ kubectl -n traefik logs deploy/traefik | tail -n 50
 From your cloned repo on the host:
 ```bash
 cd ~/myflix/charts/jellyfin
-helm upgrade --install jellyfin .   --namespace myflix   --atomic --wait --timeout 5m --history-max 5
+helm upgrade --install jellyfin .   -n myflix -f values.yaml -f values.private.yaml   --atomic --wait --timeout 5m --history-max 5
 ```
 
 **Expected mounts**

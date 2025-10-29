@@ -2,12 +2,13 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: myflix-backup
+  name: backup-cronjob
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "jellyfin.labels" . | nindent 4 }}
 spec:
   schedule: "{{ .Values.backup.schedule }}"
+  timeZone: "{{ .Values.backup.timeZone }}"
   jobTemplate:
     spec:
       template:
