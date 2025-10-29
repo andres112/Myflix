@@ -60,31 +60,39 @@ kubectl create namespace myflix
 ```
 myflix/
 ├─ charts/
-│  ├─ traefik-sec/
-│  │   ├─ Chart.yaml
-│  │   ├─ values.yaml
-│  │   └─ templates/
-│  │       ├─ middleware.yaml
-│  │       ├─ _helpers.tpl
-│  │       └─ NOTES.txt
 │  ├─ cloudflare/
 │  │   ├─ Chart.yaml
 │  │   ├─ values.yaml
 │  │   └─ templates/
-│  │       ├─ deployment.yaml
+│  │       ├─ _helpers.tpl
 │  │       ├─ configmap.yaml
+│  │       ├─ deployment.yaml
 │  │       ├─ secret.yaml
-│  │       ├─ serviceaccount.yaml
-│  │       └─ _helpers.tpl
-│  └─ jellyfin/
+│  │       └─ serviceaccount.yaml
+│  ├─ jellyfin/
+│  │   ├─ Chart.yaml
+│  │   ├─ values.private.yaml
+│  │   ├─ values.yaml
+│  │   └─ templates/
+│  │       ├─ _helpers.tpl
+│  │       ├─ deployment.yaml
+│  │       ├─ ingressroute.yaml
+│  │       ├─ NOTES.txt
+│  │       ├─ pv-pvc.yaml
+│  │       ├─ service.yaml
+│  │       └─ backup/
+│  │           ├─ configmap-script.yaml
+│  │           ├─ cronjob.yaml
+│  │           ├─ role.yaml
+│  │           ├─ rolebinding.yaml
+│  │           └─ serviceaccount.yaml
+│  └─ traefik-sec/
 │      ├─ Chart.yaml
 │      ├─ values.yaml
 │      └─ templates/
-│          ├─ deployment.yaml
-│          ├─ service.yaml
-│          ├─ ingressroute.yaml
-│          ├─ pv-pvc.yaml
-│          └─ _helpers.tpl
+│          ├─ _helpers.tpl
+│          ├─ middleware.yaml
+│          ├─ NOTES.txt
 └─ README.md
 ```
 
@@ -252,6 +260,31 @@ kubectl -n traefik logs deploy/traefik | grep <subdomain>.<your-domain> | tail -
 ```
 
 Expected: `302 → 200 OK` from Jellyfin; HSTS/CSP headers present; valid Edge→Origin chain.
+
+---
+
+## Phase 8 – Backup Strategy (Cloud‑Only, Free Tier)
+
+**Goal:** Back up **only** Jellyfin configuration + database (the `config` folder) off‑site using **Cloudflare R2** free tier.  
+**Exclusions:** media and cache (not backed up).  
+**Schedule:** every **2 days** at **03:00 Europe/Zurich**.  
+**Retention:** keep the **last 5** backups; prune older ones.
+
+### 8.1 Prerequisites (Cloudflare R2)
+1. Create an R2 bucket, e.g. **`myflix-backups`**.  
+2. Create an **R2 Access Key** (Account API Token) with **Admin Read & Write**.  
+   - Security tip: consider a **dedicated Cloudflare account** exclusively for MyFlix backups to scope impact.  
+3. Note your **Account ID** and **R2 endpoint**:  
+   `https://<CF_ACCOUNT_ID>.r2.cloudflarestorage.com`
+
+### 8.2 Kubernetes Secret (store keys only; never commit)
+```bash
+kubectl create ns myflix 2>/dev/null || true
+kubectl -n myflix create secret generic rclone-r2-secret   --from-literal=AWS_ACCESS_KEY_ID='<ACCESS_KEY_ID>'   --from-literal=AWS_SECRET_ACCESS_KEY='<SECRET_ACCESS_KEY>'
+```
+
+**Outcome:** Off‑site, free‑tier automated backups of Jellyfin config+DB, with retention and Zurich‑time scheduling.  
+**Security:** Account ID may be public; keys live only in K8s Secret; nothing sensitive committed to Git.
 
 ---
 
