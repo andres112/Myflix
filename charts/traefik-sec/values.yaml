@@ -26,7 +26,7 @@ headers:
     base-uri 'self';
     {{- else }}
     default-src 'self';
-    img-src 'self' https://image.tmdb.org https://m.media-amazon.com https://i.ytimg.com https://repo.jellyfin.org data: blob:;
+    img-src 'self' https://image.tmdb.org https://m.media-amazon.com https://i.ytimg.com https://repo.jellyfin.org https://image.tmdb.org data: blob:;
     media-src 'self' blob:;
     style-src 'self' 'unsafe-inline';
     script-src 'self' blob: https://www.youtube.com;
