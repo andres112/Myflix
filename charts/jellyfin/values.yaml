@@ -40,7 +40,7 @@ ingress:
     
 backup:
   enabled: true
-  schedule: "0 3 */2 * *"          # 03:00 every 2 days
+  schedule: "0 18 */2 * *"          # 18:00 every 2 days
   timeZone: "Europe/Zurich"
   r2Bucket: "myflix-backups"
   retention:

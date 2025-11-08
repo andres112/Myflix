@@ -10,6 +10,8 @@ headers:
   preload: true
   referrerPolicy: "strict-origin-when-cross-origin"
   frameDeny: true
+  customResponseHeaders:
+    X-Robots-Tag: "noindex, nofollow"
   contentSecurityPolicy: |
     {{- if .Values.setupMode }}
     default-src 'self';
