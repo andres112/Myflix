@@ -28,9 +28,9 @@ data:
     # 2. Upload to R2
     rclone copy "$TMP_DIR" "$DEST/$TIMESTAMP" --progress
 
-    # 3. Retention policy: keep only the last 5 backups
+    # 3. Retention policy: keep only the last N backups (from values.yaml)
     BACKUPS=$(rclone lsf "$DEST" --dirs-only | sort -r)
-    KEEP=$(echo "$BACKUPS" | head -n 5)
+    KEEP=$(echo "$BACKUPS" | head -n {{ .Values.backup.retention.daily }})
 
     for DIR in $BACKUPS; do
       if ! echo "$KEEP" | grep -q "$DIR"; then

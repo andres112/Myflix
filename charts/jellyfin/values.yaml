@@ -45,5 +45,4 @@ backup:
   r2Bucket: "myflix-backups"
   retention:
     daily: 3
-    weekly: 2
   r2SecretName: rclone-r2-secret
