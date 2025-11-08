@@ -2,4 +2,4 @@
 *.pem
 *.key
 values.private.yaml
-reorganize_folders.py
+movies_catalog.py
