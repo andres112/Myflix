@@ -1,0 +1,23 @@
+@import url("https://cdn.jsdelivr.net/gh/tedhinklater/finimalism@main/finimalism10.11-black.css");
+
+@import url("https://cdn.jsdelivr.net/gh/tedhinklater/finimalism@main/horizontal-scrolling.css");
+
+@keyframes fadeContainer {
+    from { opacity: 0.5; }
+    to   { opacity: 0.9; }
+}
+
+@keyframes fadeSaturation {
+    from { backdrop-filter: saturate(100%) }
+    to   { backdrop-filter: saturate(0%) }
+}
+
+.detailPagePrimaryContainer,
+.detailPageSecondaryContainer {
+  background-color: rgba(0,0,0,0) !important;
+}
+
+.layout-desktop .page.libraryPage.itemDetailPage.noSecondaryNavPage.selfBackdropPage.mainAnimatedPage::before, 
+.layout-tv .page.libraryPage.itemDetailPage.noSecondaryNavPage.selfBackdropPage.mainAnimatedPage::before {
+  animation: fadeSaturation 6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
