@@ -39,6 +39,7 @@ sudo ufw enable
 
 ```bash
 curl -sfL https://get.k3s.io | sh -s - --disable traefik --disable servicelb
+# REQUIRED AFTER REBOOT SERVER.
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 mkdir -p ~/.kube && sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config && sudo chown $USER:$USER ~/.kube/config
 kubectl get nodes -o wide

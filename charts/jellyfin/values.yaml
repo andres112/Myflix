@@ -24,11 +24,11 @@ persistence:
 
 resources:
   requests:
-    cpu: 500m
-    memory: 1Gi
+    cpu: 1000m
+    memory: 2Gi
   limits:
     cpu: 2000m
-    memory: 2Gi
+    memory: 3Gi
 
 ingress:
   enabled: true
