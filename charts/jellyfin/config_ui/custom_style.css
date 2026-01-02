@@ -1,3 +1,5 @@
+/* configuration is done in Jellyfin Admin UI under Dashboard > Branding > Custom CSS code */
+
 @import url("https://cdn.jsdelivr.net/gh/tedhinklater/finimalism@main/finimalism10.11-black.css");
 
 @import url("https://cdn.jsdelivr.net/gh/tedhinklater/finimalism@main/horizontal-scrolling.css");
